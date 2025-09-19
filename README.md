@@ -1,4 +1,9 @@
+
 # Crypto Price Tracker
+
+![Python CI](https://github.com/cg112358/crypto-price-tracker/actions/workflows/python-tests.yml/badge.svg)
+![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)
+![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
 
 A simple, offline-first crypto holdings tracker that reads an Excel file and enriches it with live prices, position values, and unrealized P/L. Outputs an updated Excel (with **Holdings** and **Summary** sheets) and optionally a CSV.
 
@@ -54,9 +59,14 @@ A template is provided at: `sample_data/Crypto_Investment_Tracker_template.xlsx`
 - If you hit API rate limits, rerun with `--offline` to validate flows without fetching prices.
 - This tool does **not** store API keys (CoinGecko endpoint used here is public).
 
-## License
-MIT
+## Docker
 
+Build and run with Docker:
+
+```bash
+docker build -t crypto-tracker .
+docker run --rm -v "$PWD":/app crypto-tracker python crypto_price_tracker.py --input sample_data/Crypto_Investment_Tracker_template.xlsx --output out/Updated_Crypto_Investment_Tracker.xlsx --offline
+```
 
 ## Testing
 
@@ -69,33 +79,23 @@ pytest -q
 make test
 ```
 
-
-## Docker
-
-Build and run with Docker:
-
-```bash
-docker build -t crypto-tracker .
-docker run --rm -v "$PWD":/app crypto-tracker python crypto_price_tracker.py --input sample_data/Crypto_Investment_Tracker_template.xlsx --output out/Updated_Crypto_Investment_Tracker.xlsx --offline
-```
-
-## Sample Data
-
-A small CSV fixture is provided for testing at `tests/fixtures/sample_holdings.csv`. The CLI test converts it to Excel and runs the tool in `--offline` mode.
-
-
 ## CI & Quality
 
 This repo includes a GitHub Actions workflow that runs **ruff**, **black** (check), and **pytest** on every push/PR to `main`.
 
-After you create the GitHub repo, add this badge to the top of the README (replace `<user>` and `<repo>`):
+After you create the GitHub repo, add this badge to the top of the README (already included here):
+
 ```
 ![Python CI](https://github.com/<user>/<repo>/actions/workflows/python-tests.yml/badge.svg)
 ```
 
 Optional local hooks with **pre-commit**:
+
 ```bash
 pip install -r dev-requirements.txt
 pre-commit install
 # then on each commit, black/ruff will run automatically
 ```
+
+## License
+MIT
