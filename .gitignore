@@ -17,3 +17,27 @@ out/
 Updated_*.xlsx
 *.csv
 NUL
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Test/coverage cache
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Ruff/Black cache
+.ruff_cache/
+
+# Output folders
+out/
+out_test/
+
+# Jupyter/IPython
+.ipynb_checkpoints/
+
+# VS Code settings
+.vscode/
