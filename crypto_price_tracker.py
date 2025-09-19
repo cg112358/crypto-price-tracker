@@ -6,7 +6,8 @@ Reads an Excel sheet of crypto holdings and enriches it with live prices,
 totals, and P/L metrics; outputs an updated Excel and CSV.
 
 Usage:
-  python crypto_price_tracker.py --input sample_data/Crypto_Investment_Tracker_template.xlsx --output out/Updated_Crypto_Investment_Tracker.xlsx
+  python crypto_price_tracker.py --input sample_data/Crypto_Investment_Tracker_template.xlsx \
+    --output out/Updated_Crypto_Investment_Tracker.xlsx
   python crypto_price_tracker.py --input your_file.xlsx --csv  # also write CSV
   python crypto_price_tracker.py --input your_file.xlsx --offline  # skip API (for testing)
 
@@ -59,6 +60,7 @@ COIN_NAME_TO_ID: Dict[str, str] = {
 
 REQUIRED_COLS = ["Date of Purchase", "Coin Type", "Quantity", "Cost per Coin (USD)"]
 
+
 @dataclass
 class PriceResult:
     usd: Optional[float]
@@ -105,6 +107,7 @@ def enrich(df: pd.DataFrame, offline: bool = False) -> pd.DataFrame:
         return out
 
     import requests
+
     session = requests.Session()
 
     for idx, row in out.iterrows():
@@ -140,18 +143,35 @@ def enrich(df: pd.DataFrame, offline: bool = False) -> pd.DataFrame:
 
 def summarize(df: pd.DataFrame) -> pd.DataFrame:
     """Aggregate totals by coin and overall."""
-    # Ensure numeric
-    for col in ["Quantity", "Cost per Coin (USD)", "Current Price (USD)", "Position Value (USD)", "Cost Basis (USD)", "Unrealized P/L (USD)"]:
+    # Work on a copy so we don't mutate the caller's DataFrame
+    df = df.copy()
+
+    # Ensure numeric types for calculations
+    numeric_cols = [
+        "Quantity",
+        "Cost per Coin (USD)",
+        "Current Price (USD)",
+        "Position Value (USD)",
+        "Cost Basis (USD)",
+        "Unrealized P/L (USD)",
+    ]
+    for col in numeric_cols:
         if col in df.columns:
             df[col] = pd.to_numeric(df[col], errors="coerce")
 
-    by_coin = df.groupby("Coin Type", dropna=False).agg(
-        Quantity=("Quantity", "sum"),
-        Cost_Basis_USD=("Cost Basis (USD)", "sum"),
-        Position_Value_USD=("Position Value (USD)", "sum"),
-        Unrealized_PL_USD=("Unrealized P/L (USD)", "sum"),
-    ).reset_index()
+    # Roll up by coin
+    by_coin = (
+        df.groupby("Coin Type", dropna=False)
+        .agg(
+            Quantity=("Quantity", "sum"),
+            Cost_Basis_USD=("Cost Basis (USD)", "sum"),
+            Position_Value_USD=("Position Value (USD)", "sum"),
+            Unrealized_PL_USD=("Unrealized P/L (USD)", "sum"),
+        )
+        .reset_index()
+    )
 
+    # Build TOTAL row
     totals = {
         "Quantity": by_coin["Quantity"].sum(),
         "Cost_Basis_USD": by_coin["Cost_Basis_USD"].sum(),
@@ -159,6 +179,7 @@ def summarize(df: pd.DataFrame) -> pd.DataFrame:
         "Unrealized_PL_USD": by_coin["Unrealized_PL_USD"].sum(),
     }
     overall = pd.DataFrame([{"Coin Type": "TOTAL", **totals}])
+
     return pd.concat([by_coin, overall], ignore_index=True)
 
 

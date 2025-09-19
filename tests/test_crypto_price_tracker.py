@@ -1,45 +1,57 @@
-import pandas as pd
-from pathlib import Path
 import importlib.util
+import sys
+from pathlib import Path
+
+import pandas as pd
 
 # Dynamically import the script as a module
 MODULE_PATH = Path(__file__).parents[1] / "crypto_price_tracker.py"
 spec = importlib.util.spec_from_file_location("crypto_price_tracker", MODULE_PATH)
 crypto = importlib.util.module_from_spec(spec)
+
+# Ensure module is registered so dataclasses/type resolution can find it
+sys.modules[spec.name] = crypto
+
 spec.loader.exec_module(crypto)
 
 
 def test_validate_schema_passes():
-    df = pd.DataFrame({
-        "Date of Purchase": ["2025-01-01"],
-        "Coin Type": ["BTC"],
-        "Quantity": [0.5],
-        "Cost per Coin (USD)": [20000.0],
-    })
+    df = pd.DataFrame(
+        {
+            "Date of Purchase": ["2025-01-01"],
+            "Coin Type": ["BTC"],
+            "Quantity": [0.5],
+            "Cost per Coin (USD)": [20000.0],
+        }
+    )
     ok, err = crypto.validate_schema(df)
     assert ok is True
     assert err is None
 
 
 def test_validate_schema_fails():
-    df = pd.DataFrame({
-        "Date of Purchase": ["2025-01-01"],
-        "Coin Type": ["BTC"],
-        "Quantity": [0.5],
-        # missing Cost per Coin (USD)
-    })
+    df = pd.DataFrame(
+        {
+            "Date of Purchase": ["2025-01-01"],
+            "Coin Type": ["BTC"],
+            "Quantity": [0.5],
+            # missing Cost per Coin (USD)
+        }
+    )
     ok, err = crypto.validate_schema(df)
     assert ok is False
     assert "Missing required columns" in err
 
 
 def test_enrich_offline_computes_cost_basis_only():
-    df = pd.DataFrame({
-        "Date of Purchase": ["2025-01-01"],
-        "Coin Type": ["BTC"],
-        "Quantity": [2.0],
-        "Cost per Coin (USD)": [10000.0],
-    })
+    df = pd.DataFrame(
+        {
+            "Date of Purchase": ["2025-01-01"],
+            "Coin Type": ["BTC"],
+            "Quantity": [2.0],
+            "Cost per Coin (USD)": [10000.0],
+        }
+    )
     out = crypto.enrich(df, offline=True)
     # No live price expected
     assert "Current Price (USD)" in out.columns
@@ -49,12 +61,14 @@ def test_enrich_offline_computes_cost_basis_only():
 
 
 def test_summarize_rolls_up_totals():
-    df = pd.DataFrame({
-        "Date of Purchase": ["2025-01-01", "2025-01-02"],
-        "Coin Type": ["BTC", "XRP"],
-        "Quantity": [1.0, 100.0],
-        "Cost per Coin (USD)": [30000.0, 0.5],
-    })
+    df = pd.DataFrame(
+        {
+            "Date of Purchase": ["2025-01-01", "2025-01-02"],
+            "Coin Type": ["BTC", "XRP"],
+            "Quantity": [1.0, 100.0],
+            "Cost per Coin (USD)": [30000.0, 0.5],
+        }
+    )
     enriched = crypto.enrich(df, offline=True)
     summary = crypto.summarize(enriched.copy())
     # Expect TOTAL row
