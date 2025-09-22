@@ -1,21 +1,28 @@
-
 # Crypto Price Tracker
 
 ![Python CI](https://github.com/cg112358/crypto-price-tracker/actions/workflows/python-tests.yml/badge.svg)
 ![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)
 ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
 
-A simple, offline-first crypto holdings tracker that reads an Excel file and enriches it with live prices, position values, and unrealized P/L. Outputs an updated Excel (with **Holdings** and **Summary** sheets) and optionally a CSV.
+A Python-based, offline-first crypto holdings tracker that integrates **data processing, API calls, and Excel automation**.  
+It reads your holdings from an Excel file, fetches live prices via the **CoinGecko API**, and outputs an updated file with  
+calculated **position values, cost basis, and unrealized profit/loss**. Results are saved to Excel (with **Holdings** and **Summary** sheets)  
+and optionally as CSV.
 
-> This project started from an earlier script and was refactored for reliability, validation, and GitHub readiness.
+> Originally a simple script, this project was refactored for reliability, validation, and GitHub readiness with CI/CD checks.
+
+---
 
 ## Features
 - Input validation for required columns
 - Live prices via CoinGecko (with retries) — or `--offline` mode for testing
 - Per-position metrics: **Cost Basis**, **Position Value**, **Unrealized P/L (USD/%)**
-- Summary by coin + Overall totals
+- Aggregated summary by coin + Overall totals
 - Multiple outputs: Excel (`.xlsx`) and optional CSV
 - Friendly CLI and simple configuration
+- Fully tested with **pytest**, linted with **ruff**, and formatted with **black**
+
+---
 
 ## Requirements
 - Python 3.9+
@@ -23,7 +30,7 @@ A simple, offline-first crypto holdings tracker that reads an Excel file and enr
 - requests
 - openpyxl
 
-Install deps:
+Install dependencies:
 
 ```bash
 pip install -r requirements.txt
@@ -31,41 +38,25 @@ pip install -r requirements.txt
 
 ## Usage
 
+Run the tracker from the command line with an input Excel file of your holdings:
+
 ```bash
+# Basic usage: read input Excel and write updated portfolio
 python crypto_price_tracker.py --input sample_data/Crypto_Investment_Tracker_template.xlsx --output out/Updated_Crypto_Investment_Tracker.xlsx
-# also write CSV
+
+# Also save a CSV alongside the Excel output
 python crypto_price_tracker.py --input your_file.xlsx --csv
-# test without API calls
+
+# Run in offline mode (no API calls, useful for testing)
 python crypto_price_tracker.py --input your_file.xlsx --offline
 ```
 
-## Excel Schema
+## Demo
 
-**Required columns (case-sensitive):**
-- `Date of Purchase`
-- `Coin Type`
-- `Quantity`
-- `Cost per Coin (USD)`
-
-**Optional:**
-- `Notes`
-
-You can add extra columns; they will be preserved in the output.
-
-A template is provided at: `sample_data/Crypto_Investment_Tracker_template.xlsx`
-
-## Notes
-- Rates are fetched from the free CoinGecko API; add new symbols by extending `COIN_NAME_TO_ID` in the script.
-- If you hit API rate limits, rerun with `--offline` to validate flows without fetching prices.
-- This tool does **not** store API keys (CoinGecko endpoint used here is public).
-
-## Docker
-
-Build and run with Docker:
+Here’s an example of running the tracker in **offline mode** with the provided template:
 
 ```bash
-docker build -t crypto-tracker .
-docker run --rm -v "$PWD":/app crypto-tracker python crypto_price_tracker.py --input sample_data/Crypto_Investment_Tracker_template.xlsx --output out/Updated_Crypto_Investment_Tracker.xlsx --offline
+python crypto_price_tracker.py --input sample_data/Crypto_Investment_Tracker_template.xlsx --output out/Updated_Crypto_Investment_Tracker.xlsx --offline
 ```
 
 ## Testing
