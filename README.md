@@ -24,11 +24,13 @@ and optionally as CSV.
 
 ---
 
-## Requirements
+## Requirements / Installation
 - Python 3.9+
 - pandas
 - requests
 - openpyxl
+- Xlsxwriter
+- pytz
 
 Install dependencies:
 
@@ -51,7 +53,7 @@ python crypto_price_tracker.py --input your_file.xlsx --csv
 python crypto_price_tracker.py --input your_file.xlsx --offline
 ```
 
-## Demo
+## Demo (with screenshot)
 
 Here’s an example of running the tracker in **offline mode** with the provided template:
 
@@ -86,6 +88,49 @@ Optional local hooks with **pre-commit**:
 pip install -r dev-requirements.txt
 pre-commit install
 # then on each commit, black/ruff will run automatically
+```
+
+## Contributor Notes (with ASCII Git diagram)
+
+---
+
+## Contributor Notes
+
+This project uses Git for version control.  
+If you’re new to Git or want a quick refresher, here’s the workflow we follow:
+
+```text
+        +------------+       git add        +-------------+
+        |   Working  | ------------------>  |   Staging   |
+        | Directory  |   (orange files)     |   Area      |
+        +------------+                      +-------------+
+               ^                                   |
+               |                                   | git commit -m "msg"
+               |                                   v
+        git pull <---------------------------  +-------------+
+        (updates from GitHub)                 |   Local Repo |
+                                              +-------------+
+                                                     |
+                                                     | git push
+                                                     v
+                                              +-------------+
+                                              | Remote Repo |
+                                              | (GitHub)    |
+                                              +-------------+
+
+👉 Quick reference:
+- **Green** = new (untracked) file
+- **Orange/Yellow** = modified file
+- **Red** = deleted file
+- **White** = unchanged (clean)
+
+Core commands:
+- `git add <file>` → stage changes
+- `git commit -m "message"` → save snapshot locally
+- `git push` → sync with GitHub
+- `git pull` → fetch & merge updates from GitHub
+
+
 ```
 
 ## License
