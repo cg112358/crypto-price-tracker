@@ -45,23 +45,36 @@ Core commands:
 ## 🌳 Repo Tree Diagram (for git-cheatsheet.md)
 
 ```text
-crypto-price-tracker/
-├─ README.md
-├─ requirements.txt
-├─ dev-requirements.txt
-├─ crypto_price_tracker.py
+crypto-tracker-repo/
+├─ .github/
+├─ docs/
+│  └─ git-cheatsheet.md
+├─ out/
+│  └─ (generated files here)
+├─ out_test/
 ├─ sample_data/
 │  └─ Crypto_Investment_Tracker_template.xlsx
 ├─ out/
 │  └─ Updated_Crypto_Investment_Tracker.xlsx (generated)
 ├─ tests/
-│  └─ test_smoke.py
-└─ docs/
-   ├─ README.md
-   ├─ git-cheatsheet.md
-   ├─ excel-schema.md
-   ├─ notes.md
-   └─ docker.md
+│  ├─ fixtures/
+│  ├─ test_cli_offline.py
+│  ├─ test_crypto_price_tracker.py
+│  └─ __pycache__/
+├─ .gitattributes
+├─ .gitignore
+├─ .pre-commit-config.yaml
+├─ crypto_price_tracker.py
+├─ dev-requirements.txt
+├─ Dockerfile
+├─ LICENSE
+├─ Makefile
+├─ pyproject.toml
+├─ pytest.ini
+├─ README.md
+├─ requirements.in
+├─ requirements.txt
+└─ (local caches: __pycache__/, .ruff_cache/, .pytest_cache/, .venv/)
    ```
 
 # ✅ Git Workflow (Clean Commit & Push)
