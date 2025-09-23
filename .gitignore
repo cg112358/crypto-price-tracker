@@ -41,3 +41,17 @@ out_test/
 
 # VS Code settings
 .vscode/
+
+# Office temp files
+~$*.xlsx
+*.tmp
+*._UL
+*.bak
+
+# macOS / Windows cruft
+.DS_Store
+Thumbs.db
+
+# Python cache
+__pycache__/
+*.pyc

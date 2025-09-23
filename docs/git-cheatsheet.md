@@ -28,7 +28,7 @@ A quick reference for the Git workflow used in this project.
 
 ## References and Commands
 
-👉 Quick reference:
+```👉 Quick reference:
 - **Green** = new (untracked) file
 - **Orange/Yellow** = modified file
 - **Red** = deleted file
@@ -41,3 +41,25 @@ Core commands:
 - `git pull` → fetch & merge updates from GitHub
 
 ```
+
+## 🌳 Repo Tree Diagram (for git-cheatsheet.md)
+
+```text
+crypto-price-tracker/
+├─ README.md
+├─ requirements.txt
+├─ dev-requirements.txt
+├─ crypto_price_tracker.py
+├─ sample_data/
+│  └─ Crypto_Investment_Tracker_template.xlsx
+├─ out/
+│  └─ Updated_Crypto_Investment_Tracker.xlsx (generated)
+├─ tests/
+│  └─ test_smoke.py
+└─ docs/
+   ├─ README.md
+   ├─ git-cheatsheet.md
+   ├─ excel-schema.md
+   ├─ notes.md
+   └─ docker.md
+   ```

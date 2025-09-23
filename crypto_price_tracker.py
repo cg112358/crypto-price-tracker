@@ -36,6 +36,21 @@ from typing import Dict, Optional, Tuple
 
 import pandas as pd
 
+import os
+import datetime
+
+# 1. Define paths
+BASE_DIR = os.path.dirname(__file__)  # folder where your script lives
+TEMPLATE_FILE = os.path.join(BASE_DIR, "sample_data", "Crypto_Investment_Tracker_template.xlsx")
+
+# 2. Generate a dated output filename
+today_str = datetime.date.today().strftime("%Y%m%d")  # e.g. 20250923
+OUT_DIR = os.path.join(BASE_DIR, "out")
+os.makedirs(OUT_DIR, exist_ok=True)
+
+OUTPUT_FILE = os.path.join(OUT_DIR, f"Updated_Crypto_Investment_Tracker_{today_str}.xlsx")
+
+
 API_URL = "https://api.coingecko.com/api/v3/simple/price"
 
 # A small, easily extendable mapping to CoinGecko IDs.
