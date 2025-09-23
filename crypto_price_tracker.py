@@ -226,27 +226,49 @@ def main(argv=None):
     enriched = enrich(df, offline=args.offline)
     summary = summarize(enriched.copy())
 
-    # Prepare output
-    out_dir = Path(args.output).parent if args.output else Path("out")
+    # Prepare outputs: latest + dated
+    out_dir = Path("out")
     out_dir.mkdir(parents=True, exist_ok=True)
-    out_xlsx = Path(args.output) if args.output else out_dir / f"Updated_{in_path.name}"
-    out_csv = out_xlsx.with_suffix(".csv")
+
+    today_str = datetime.date.today().strftime("%Y%m%d")
+    latest_xlsx = out_dir / "Updated_Crypto_Investment_Tracker.xlsx"
+    dated_xlsx  = out_dir / f"Updated_Crypto_Investment_Tracker_{today_str}.xlsx"
+
+    # Back-compat: if user provided --output, also write that path
+    extra_xlsx = Path(args.output) if args.output else None
 
     # Write Excel with multiple sheets
     try:
-        with pd.ExcelWriter(out_xlsx, engine="openpyxl") as writer:
-            enriched.to_excel(writer, index=False, sheet_name="Holdings")
-            summary.to_excel(writer, index=False, sheet_name="Summary")
+        def _write_all(path: Path):
+            with pd.ExcelWriter(path, engine="openpyxl") as writer:
+                # optional: include the raw transactions
+                df.to_excel(writer, index=False, sheet_name="Transactions")
+                enriched.to_excel(writer, index=False, sheet_name="Holdings")
+                summary.to_excel(writer, index=False, sheet_name="Summary")
+
+        # write “latest” and “dated” every run
+        for p in (latest_xlsx, dated_xlsx):
+            _write_all(p)
+
+        # also honor --output if user passed it
+        if extra_xlsx:
+            _write_all(extra_xlsx)
+
+        # optional CSV alongside “latest”
         if args.csv:
-            enriched.to_csv(out_csv, index=False)
+            latest_csv = latest_xlsx.with_suffix(".csv")
+            enriched.to_csv(latest_csv, index=False)
+
+        print(f"[OK] Wrote: {latest_xlsx}")
+        print(f"[OK] Wrote: {dated_xlsx}")
+        if extra_xlsx:
+            print(f"[OK] Wrote: {extra_xlsx}")
+        if args.csv:
+            print(f"[OK] Wrote CSV: {latest_csv}")
+
     except Exception as e:
         print(f"[ERROR] Failed to write outputs: {e}")
         sys.exit(1)
-
-    print(f"[OK] Wrote: {out_xlsx}")
-    if args.csv:
-        print(f"[OK] Wrote: {out_csv}")
-
 
 if __name__ == "__main__":
     main()
