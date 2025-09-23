@@ -1,0 +1,17 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Open Template Excel",
+      "type": "shell",
+      "command": "start excel sample_data/Crypto_Investment_Tracker_template.xlsx",
+      "problemMatcher": []
+    },
+    {
+      "label": "Open Latest Output Excel",
+      "type": "shell",
+      "command": "start excel out/Updated_Crypto_Investment_Tracker.xlsx",
+      "problemMatcher": []
+    }
+  ]
+}

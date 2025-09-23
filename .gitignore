@@ -41,6 +41,7 @@ out_test/
 
 # VS Code settings
 .vscode/
+!.vscode/tasks.json
 
 # Office temp files
 ~$*.xlsx
