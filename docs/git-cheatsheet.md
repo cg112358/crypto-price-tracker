@@ -76,7 +76,7 @@ crypto-tracker-repo/
 ├─ requirements.txt
 └─ (local caches: __pycache__/, .ruff_cache/, .pytest_cache/, .venv/)
    ```
-
+ 
 # ✅ Git Workflow (Clean Commit & Push)
 
 Use this sequence to safely commit changes and push them to GitHub:
