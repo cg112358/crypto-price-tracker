@@ -1,20 +1,4 @@
-
-[tool.pytest.ini_options]
-addopts = "-q"
-pythonpath = ["."]
-
 [tool.black]
-line-length = 120
+line-length = 100
 target-version = ["py311"]
-
-[tool.ruff]
-line-length = 120
-target-version = "py311"
-
-[tool.ruff.lint]
-select = ["E", "F", "I"]   # basics + import sorting
-ignore = []
-
-[tool.ruff.format]
-quote-style = "double"
-indent-style = "space"
+skip-string-normalization = true
