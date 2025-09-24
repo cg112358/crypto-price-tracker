@@ -39,6 +39,34 @@ import pandas as pd
 import os
 import datetime
 
+# --- Postgres loader helpers ---
+from typing import Optional
+from sqlalchemy import create_engine, text
+
+def load_transactions_to_postgres(
+    df_transactions,                     # pandas DataFrame of normalized rows
+    db_url: str,                          # e.g., postgresql+psycopg2://crypto_user:StrongPassword123!@localhost:5432/crypto_tracker
+    schema: str = "app",
+    table: str = "transactions",
+    truncate_first: bool = True,
+) -> int:
+    """
+    Loads df_transactions into schema.table on Postgres.
+    Expects columns:
+      date_of_purchase, coin_type, quantity, cost_per_coin_usd, feesusd,
+      exchange, txid, notes, totalcostusd
+    Returns number of rows written.
+    """
+    engine = create_engine(db_url, future=True)
+    with engine.begin() as cx:
+        if truncate_first:
+            cx.execute(text(f"TRUNCATE {schema}.{table};"))
+        df_transactions.to_sql(table, cx, schema=schema, if_exists="append", index=False)
+        # confirm rowcount
+        res = cx.execute(text(f"SELECT COUNT(*) FROM {schema}.{table};")).scalar_one()
+    return int(res)
+
+
 # 1. Define paths
 BASE_DIR = os.path.dirname(__file__)  # folder where your script lives
 TEMPLATE_FILE = os.path.join(BASE_DIR, "sample_data", "Crypto_Investment_Tracker_template.xlsx")
