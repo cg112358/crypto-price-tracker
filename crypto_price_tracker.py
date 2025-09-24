@@ -61,6 +61,7 @@ REQUIRED_COLS_DISPLAY = [
     "Cost per Coin (USD)",
 ]
 
+
 # --------------------------------
 # Helpers: price fetch + dataclass
 # --------------------------------
@@ -93,9 +94,9 @@ def get_current_price(coin_id: str, session, max_retries: int = 3, backoff: floa
 # --------------------------------
 def _norm(s: str) -> str:
     s = str(s)
-    s = re.sub(r"[\u200b\u200c\u200d]", "", s)   # remove zero-width chars
-    s = re.sub(r"[_\-]+", " ", s)                # underscores/dashes -> space
-    s = re.sub(r"\s+", " ", s).strip().lower()   # collapse spaces & lowercase
+    s = re.sub(r"[\u200b\u200c\u200d]", "", s)  # remove zero-width chars
+    s = re.sub(r"[_\-]+", " ", s)  # underscores/dashes -> space
+    s = re.sub(r"\s+", " ", s).strip().lower()  # collapse spaces & lowercase
     return s
 
 
@@ -135,8 +136,14 @@ def normalize_headers(df: pd.DataFrame) -> pd.DataFrame:
 
     # Step 3: ensure required columns exist
     required_working = [
-        "date of purchase", "coin type", "quantity", "cost per coin (usd)",
-        "feesusd", "exchange", "txid", "notes"
+        "date of purchase",
+        "coin type",
+        "quantity",
+        "cost per coin (usd)",
+        "feesusd",
+        "exchange",
+        "txid",
+        "notes",
     ]
     for col in required_working:
         if col not in df.columns:
@@ -149,17 +156,19 @@ def normalize_headers(df: pd.DataFrame) -> pd.DataFrame:
         df["totalcostusd"] = df["quantity"] * df["cost per coin (usd)"] + df["feesusd"]
 
     # Step 5: rename to **display** headers expected everywhere else
-    df = df.rename(columns={
-        "date of purchase": "Date of Purchase",
-        "coin type": "Coin Type",
-        "quantity": "Quantity",
-        "cost per coin (usd)": "Cost per Coin (USD)",
-        "feesusd": "FeesUSD",
-        "exchange": "Exchange",
-        "txid": "TxID",
-        "notes": "Notes",
-        "totalcostusd": "TotalCostUSD",
-    })
+    df = df.rename(
+        columns={
+            "date of purchase": "Date of Purchase",
+            "coin type": "Coin Type",
+            "quantity": "Quantity",
+            "cost per coin (usd)": "Cost per Coin (USD)",
+            "feesusd": "FeesUSD",
+            "exchange": "Exchange",
+            "txid": "TxID",
+            "notes": "Notes",
+            "totalcostusd": "TotalCostUSD",
+        }
+    )
     return df
 
 
@@ -189,6 +198,7 @@ def enrich(df: pd.DataFrame, offline: bool = False) -> pd.DataFrame:
         return out.drop(columns=["Coin Key"])
 
     import requests
+
     session = requests.Session()
 
     for idx, row in out.iterrows():
@@ -294,8 +304,11 @@ def main(argv=None):
     parser.add_argument("--csv", action="store_true", help="Also write a CSV alongside the Excel output")
     parser.add_argument("--offline", action="store_true", help="Skip price API calls")
     parser.add_argument("--to-postgres", action="store_true", help="Load normalized rows to Postgres")
-    parser.add_argument("--db-url", default="postgresql+psycopg2://crypto_user:StrongPassword123!@localhost:5432/crypto_tracker",
-                        help="SQLAlchemy DB URL for Postgres (used with --to-postgres)")
+    parser.add_argument(
+        "--db-url",
+        default="postgresql+psycopg2://crypto_user:StrongPassword123!@localhost:5432/crypto_tracker",
+        help="SQLAlchemy DB URL for Postgres (used with --to-postgres)",
+    )
     args = parser.parse_args(argv)
 
     in_path = Path(args.input).resolve()
@@ -360,19 +373,30 @@ def main(argv=None):
     # 7) Optional Postgres load (use normalized working column names)
     if args.to_postgres:
         # Convert display headers -> working names that match DB schema
-        w = df.rename(columns={
-            "Date of Purchase": "date_of_purchase",
-            "Coin Type": "coin_type",
-            "Quantity": "quantity",
-            "Cost per Coin (USD)": "cost_per_coin_usd",
-            "FeesUSD": "feesusd",
-            "Exchange": "exchange",
-            "TxID": "txid",
-            "Notes": "notes",
-            "TotalCostUSD": "totalcostusd",
-        })[
-            ["date_of_purchase","coin_type","quantity","cost_per_coin_usd",
-             "feesusd","exchange","txid","notes","totalcostusd"]
+        w = df.rename(
+            columns={
+                "Date of Purchase": "date_of_purchase",
+                "Coin Type": "coin_type",
+                "Quantity": "quantity",
+                "Cost per Coin (USD)": "cost_per_coin_usd",
+                "FeesUSD": "feesusd",
+                "Exchange": "exchange",
+                "TxID": "txid",
+                "Notes": "notes",
+                "TotalCostUSD": "totalcostusd",
+            }
+        )[
+            [
+                "date_of_purchase",
+                "coin_type",
+                "quantity",
+                "cost_per_coin_usd",
+                "feesusd",
+                "exchange",
+                "txid",
+                "notes",
+                "totalcostusd",
+            ]
         ]
 
         try:
