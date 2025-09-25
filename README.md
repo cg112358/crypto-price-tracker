@@ -1,11 +1,10 @@
 # 🚀 Crypto Price Tracker
 
-[![Python CI](https://github.com/cg112358/crypto-price-tracker/actions/workflows/python-tests.yml/badge.svg)](https://github.com/cg112358/crypto-price-tracker/actions/workflows/python-tests.yml)  
+![CI](https://github.com/cg112358/crypto-price-tracker/actions/workflows/ci.yml/badge.svg)
 ![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)  
 ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
 
 See the full [Git Cheatsheet](docs/git-cheatsheet.md) for workflow diagram, color legend, and common commands.
-
 ---
 
 A Python-based, offline-first crypto holdings tracker that integrates **data processing, API calls, and Excel automation**.  
