@@ -71,7 +71,9 @@ class PriceResult:
     error: Optional[str] = None
 
 
-def get_current_price(coin_id: str, session, max_retries: int = 3, backoff: float = 1.0) -> PriceResult:
+def get_current_price(
+    coin_id: str, session, max_retries: int = 3, backoff: float = 1.0
+) -> PriceResult:
     """Fetch current USD price from CoinGecko with simple retries."""
     params = {"ids": coin_id, "vs_currencies": "usd"}
     for attempt in range(1, max_retries + 1):
@@ -301,9 +303,13 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description="Crypto Price Tracker")
     parser.add_argument("--input", "-i", required=True, help="Path to input Excel file")
     parser.add_argument("--output", "-o", help="Optional explicit output Excel path")
-    parser.add_argument("--csv", action="store_true", help="Also write a CSV alongside the Excel output")
+    parser.add_argument(
+        "--csv", action="store_true", help="Also write a CSV alongside the Excel output"
+    )
     parser.add_argument("--offline", action="store_true", help="Skip price API calls")
-    parser.add_argument("--to-postgres", action="store_true", help="Load normalized rows to Postgres")
+    parser.add_argument(
+        "--to-postgres", action="store_true", help="Load normalized rows to Postgres"
+    )
     parser.add_argument(
         "--db-url",
         default="postgresql+psycopg2://crypto_user:StrongPassword123!@localhost:5432/crypto_tracker",
@@ -346,20 +352,29 @@ def main(argv=None):
     explicit_xlsx = Path(args.output) if args.output else None
 
     # 6) Write Excel (and optional CSV)
-    def _write_all(path: Path):
+    def _write_all(
+        path: Path, df_txn: pd.DataFrame, df_hold: pd.DataFrame, df_summary: pd.DataFrame
+    ) -> None:
+        path.parent.mkdir(parents=True, exist_ok=True)
         with pd.ExcelWriter(path, engine="openpyxl") as writer:
-            df.to_excel(writer, index=False, sheet_name="Transactions")
-            enriched.to_excel(writer, index=False, sheet_name="Holdings")
-            summary.to_excel(writer, index=False, sheet_name="Summary")
+            df_txn.to_excel(writer, index=False, sheet_name="Transactions")
+            df_hold.to_excel(writer, index=False, sheet_name="Holdings")
+            df_summary.to_excel(writer, index=False, sheet_name="Summary")
 
     try:
+        # Always write the standard outputs
         for p in (latest_xlsx, dated_xlsx):
-            _write_all(p)
+            _write_all(p, df, enriched, summary)
+
+        # If user supplied --output, write there too
         if explicit_xlsx:
-            _write_all(explicit_xlsx)
+            _write_all(explicit_xlsx, df, enriched, summary)
+
+        # CSV logic: mirror beside --output if provided; else beside latest
         if args.csv:
-            latest_csv = latest_xlsx.with_suffix(".csv")
-            enriched.to_csv(latest_csv, index=False)
+            csv_target = (explicit_xlsx or latest_xlsx).with_suffix(".csv")
+            csv_target.parent.mkdir(parents=True, exist_ok=True)
+            enriched.to_csv(csv_target, index=False)
     except Exception as e:
         sys.exit(f"[ERROR] Failed to write outputs: {e}")
 
@@ -368,7 +383,7 @@ def main(argv=None):
     if explicit_xlsx:
         print(f"[OK] Wrote: {explicit_xlsx}")
     if args.csv:
-        print(f"[OK] Wrote CSV: {latest_xlsx.with_suffix('.csv')}")
+        print(f"[OK] Wrote CSV: {(explicit_xlsx or latest_xlsx).with_suffix('.csv')}")
 
     # 7) Optional Postgres load (use normalized working column names)
     if args.to_postgres:
