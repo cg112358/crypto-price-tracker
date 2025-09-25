@@ -45,8 +45,9 @@ Core commands:
 ## 🌳 Repo Tree Diagram (for git-cheatsheet.md)
 
 ```text
-crypto-tracker-repo/
-├─ .github/
+crypto-tracker-repo
+├─ .github/workflows
+|  └─ ci.yml
 ├─ docs/
 │  └─ git-cheatsheet.md
 ├─ out/
