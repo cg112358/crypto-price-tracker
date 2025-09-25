@@ -1,6 +1,6 @@
 # 🚀 Crypto Price Tracker
 
-![CI](https://github.com/cg112358/crypto-price-tracker/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/cg112358/crypto-price-tracker/actions/workflows/ci.yml/badge.svg?branch=main)
 ![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)  
 ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
 
