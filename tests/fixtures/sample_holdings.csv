@@ -1,0 +1,5 @@
+Date,Coin,Quantity,CostPerCoinUSD,FeesUSD,Exchange,TxID,Notes,TotalCostUSD
+2025-08-01,BTC,0.15,62000.0,3.5,Coinbase,demo-btc-001,Initial DCA buy,9303.5
+2025-08-15,BTC,0.075,58500.0,2.25,Coinbase,demo-btc-002,Dip buy,4389.75
+2025-09-02,ETH,1.8,2650.0,4.1,Kraken,demo-eth-001,Split into staking later,4774.1
+2025-09-10,XRP,1200.0,0.78,1.2,Uphold,demo-xrp-001,Test transfer after buy,937.2
