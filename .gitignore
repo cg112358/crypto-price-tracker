@@ -18,6 +18,10 @@ Updated_*.xlsx
 *.csv
 NUL
 
+# Allow checked-in test fixtures (override *.csv)
+!tests/fixtures/
+!tests/fixtures/*.csv
+
 # Python cache
 __pycache__/
 *.py[cod]
@@ -56,7 +60,3 @@ Thumbs.db
 # Python cache
 __pycache__/
 *.pyc
-
-# Allow checked-in test fixtures (override *.csv)
-!tests/fixtures/
-!tests/fixtures/*.csv
