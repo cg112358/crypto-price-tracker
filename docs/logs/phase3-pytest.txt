@@ -1,0 +1,10 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.10, pytest-9.0.2, pluggy-1.6.0
+rootdir: C:\Dev\DevRepos\crypto-price-tracker
+configfile: pytest.ini
+collected 5 items
+
+tests\test_cli_offline.py .                                              [ 20%]
+tests\test_crypto_price_tracker.py ....                                  [100%]
+
+============================== 5 passed in 1.37s ==============================

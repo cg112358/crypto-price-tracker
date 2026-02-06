@@ -1,62 +1,38 @@
 # Python
 __pycache__/
-*.pyc
-*.pyo
+*.py[cod]
 *.pyd
 *.egg-info/
 .venv/
 venv/
 .env
 
-# OS
-.DS_Store
-Thumbs.db
+# Test / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Lint / format
+.ruff_cache/
 
 # Output
 out/
+out_test/
 Updated_*.xlsx
 *.csv
-NUL
 
 # Allow checked-in test fixtures (override *.csv)
 !tests/fixtures/
 !tests/fixtures/*.csv
 
-# Python cache
-__pycache__/
-*.py[cod]
-*.pyo
-*.pyd
-
-# Test/coverage cache
-.pytest_cache/
-.coverage
-htmlcov/
-
-# Ruff/Black cache
-.ruff_cache/
-
-# Output folders
-out/
-out_test/
-
-# Jupyter/IPython
-.ipynb_checkpoints/
-
-# VS Code settings
+# Editor / OS
 .vscode/
 !.vscode/tasks.json
+.DS_Store
+Thumbs.db
 
 # Office temp files
 ~$*.xlsx
 *.tmp
 *._UL
 *.bak
-
-# macOS / Windows cruft
-.DS_Store
-Thumbs.db
-
-# Python cache
-__pycache__/
-*.pyc
