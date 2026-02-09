@@ -349,7 +349,17 @@ def main(argv=None):
     today_str = datetime.date.today().strftime("%Y%m%d")
     latest_xlsx = out_dir / "Updated_Crypto_Investment_Tracker.xlsx"
     dated_xlsx = out_dir / f"Updated_Crypto_Investment_Tracker_{today_str}.xlsx"
-    explicit_xlsx = Path(args.output) if args.output else None
+    explicit_xlsx: Optional[Path] = None
+    explicit_dir: Optional[Path] = None
+
+    if args.output:
+        p = Path(args.output)
+        # If it has no suffix or is an existing dir, treat it as a directory target
+        if p.suffix.lower() != ".xlsx" or p.is_dir():
+            explicit_dir = p
+            explicit_xlsx = explicit_dir / "Updated_Crypto_Investment_Tracker.xlsx"
+        else:
+            explicit_xlsx = p
 
     # 6) Write Excel (and optional CSV)
     def _write_all(
