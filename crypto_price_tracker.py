@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# pyright: reportArgumentType=false
+
 """
 Crypto Price Tracker
 --------------------
@@ -25,8 +27,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, Optional, Tuple
 
-import numpy as np
-import pandas as pd
+import numpy as np  # type: ignore[import-not-found]
+import pandas as pd  # type: ignore[import-not-found]
+
 
 # Optional Postgres imports happen only if --to-postgres is used (imported lazily)
 
@@ -215,7 +218,12 @@ def enrich(df: pd.DataFrame, offline: bool = False) -> pd.DataFrame:
 
         price = float(pr.usd)
         qty = float(row["Quantity"])
-        cost_basis = float(out.at[idx, "Cost Basis (USD)"])
+
+        cb = pd.to_numeric(out.at[idx, "Cost Basis (USD)"], errors="coerce")
+        if pd.isna(cb) or cb == 0:
+            out.at[idx, "Unrealized P/L (%)"] = pd.NA
+            continue
+        cost_basis = float(cb)
 
         position_value = round(price * qty, 2)
         pl_usd = round(position_value - cost_basis, 2)
