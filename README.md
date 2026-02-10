@@ -35,13 +35,21 @@ and optionally as CSV.
 - XlsxWriter
 - pytz
 
-Install dependencies:
+### Virtual environment (Git Bash / macOS / Linux)
 
 ```bash
+python -m venv .venv
+source ./.venv/Scripts/activate
 pip install -r requirements.txt
 ```
 
----
+### Optional helper script
+
+If you prefer a shortcut, you can activate the virtual environment with:
+
+```bash
+source ./activate.sh
+```
 
 ## ⚡ Usage
 
