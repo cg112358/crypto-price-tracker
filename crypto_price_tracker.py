@@ -21,6 +21,7 @@ from __future__ import annotations
 import argparse
 import datetime
 import re
+import requests
 import sys
 import time
 from dataclasses import dataclass
@@ -73,25 +74,40 @@ class PriceResult:
     usd: Optional[float]
     error: Optional[str] = None
 
-
 def get_current_price(
     coin_id: str, session, max_retries: int = 3, backoff: float = 1.0
 ) -> PriceResult:
     """Fetch current USD price from CoinGecko with simple retries."""
     params = {"ids": coin_id, "vs_currencies": "usd"}
+
     for attempt in range(1, max_retries + 1):
         try:
             resp = session.get(API_URL, params=params, timeout=10)
+
+            # Special case: rate limit
+            if resp.status_code == 429:
+                wait = max(5.0, backoff * attempt * 5.0)  # e.g., 5s, 10s, 15s...
+                if attempt == max_retries:
+                    return PriceResult(usd=None, error=f"Rate limited (429). Waited {wait:.0f}s.")
+                print(f"[WARN] Rate limited (429). Sleeping {wait:.0f}s then retrying...")
+                time.sleep(wait)
+                continue
+
             resp.raise_for_status()
+
             data = resp.json()
             if coin_id in data and "usd" in data[coin_id]:
                 return PriceResult(usd=float(data[coin_id]["usd"]))
+
             return PriceResult(usd=None, error="Malformed response")
+
         except Exception as e:
             if attempt == max_retries:
                 return PriceResult(usd=None, error=str(e))
             time.sleep(backoff * attempt)
+
     return PriceResult(usd=None, error="Unknown error")
+
 
 
 # --------------------------------
@@ -119,7 +135,7 @@ def normalize_headers(df: pd.DataFrame) -> pd.DataFrame:
         "date of purchase": {"date", "purchase date", "date purchased"},
         "coin type": {"coin", "asset", "symbol", "ticker"},
         "quantity": {"qty", "amount", "units"},
-        "cost per coin (usd)": {"cost per coin", "price", "unit price", "ppercoin", "price usd"},
+        "cost per coin (usd)": {"cost per coin", "price", "unit price", "ppercoin", "price usd", "costpercoinusd"},
         "feesusd": {"fees", "fee", "fee usd", "fees (usd)"},
         "exchange": {"exchange", "platform", "broker"},
         "txid": {"txid", "tx id", "transaction id", "hash"},
@@ -195,9 +211,13 @@ def enrich(df: pd.DataFrame, offline: bool = False) -> pd.DataFrame:
     # initialize columns
     out["Current Price (USD)"] = pd.NA
     out["Position Value (USD)"] = pd.NA
-    out["Cost Basis (USD)"] = (out["Quantity"] * out["Cost per Coin (USD)"]).round(2)
+
+    fees = pd.to_numeric(out["FeesUSD"], errors="coerce").fillna(0)
+    out["Cost Basis (USD)"] = (out["Quantity"] * out["Cost per Coin (USD)"] + fees).round(2)
+
     out["Unrealized P/L (USD)"] = pd.NA
     out["Unrealized P/L (%)"] = pd.NA
+
 
     if offline:
         return out.drop(columns=["Coin Key"])
@@ -205,15 +225,28 @@ def enrich(df: pd.DataFrame, offline: bool = False) -> pd.DataFrame:
     import requests
 
     session = requests.Session()
+    price_cache: Dict[str, PriceResult] = {}
 
     for idx, row in out.iterrows():
-        key = row["Coin Key"]
+        key = str(row["Coin Key"])
         coin_id = COIN_NAME_TO_ID.get(key)
         if not coin_id:
+            print(f"[WARN] Unsupported coin symbol/name in sheet: {row['Coin Type']}")
             continue
 
-        pr = get_current_price(coin_id, session=session)
+        pr = price_cache.get(coin_id)
+        if pr is None:
+            print(f"[INFO] Fetching live price for {coin_id}")
+            pr = get_current_price(coin_id, session=session)
+            if pr.usd is not None:
+                price_cache[coin_id] = pr
+                time.sleep(1.0)
+
         if pr.usd is None:
+            print(
+                f"[WARN] Live price unavailable for {row['Coin Type']} "
+                f"(id={coin_id}): {pr.error}"
+            )
             continue
 
         price = float(pr.usd)
@@ -233,9 +266,6 @@ def enrich(df: pd.DataFrame, offline: bool = False) -> pd.DataFrame:
         out.at[idx, "Position Value (USD)"] = position_value
         out.at[idx, "Unrealized P/L (USD)"] = pl_usd
         out.at[idx, "Unrealized P/L (%)"] = pl_pct
-
-        # polite pacing for free API
-        time.sleep(1.0)
 
     return out.drop(columns=["Coin Key"])
 
