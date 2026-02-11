@@ -218,6 +218,9 @@ def enrich(df: pd.DataFrame, offline: bool = False) -> pd.DataFrame:
     out["Current Price (USD)"] = pd.NA
     out["Position Value (USD)"] = pd.NA
 
+    if "FeesUSD" not in out.columns:
+        out["FeesUSD"] = 0
+
     fees = pd.to_numeric(out["FeesUSD"], errors="coerce").fillna(0)
     out["Cost Basis (USD)"] = (out["Quantity"] * out["Cost per Coin (USD)"] + fees).round(2)
 
