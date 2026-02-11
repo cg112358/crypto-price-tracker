@@ -31,7 +31,6 @@ from typing import Dict, Optional, Tuple
 import numpy as np  # type: ignore[import-not-found]
 import pandas as pd  # type: ignore[import-not-found]
 
-
 # Optional Postgres imports happen only if --to-postgres is used (imported lazily)
 
 # -----------------------------
@@ -74,6 +73,7 @@ class PriceResult:
     usd: Optional[float]
     error: Optional[str] = None
 
+
 def get_current_price(
     coin_id: str, session, max_retries: int = 3, backoff: float = 1.0
 ) -> PriceResult:
@@ -109,7 +109,6 @@ def get_current_price(
     return PriceResult(usd=None, error="Unknown error")
 
 
-
 # --------------------------------
 # Header normalization utilities
 # --------------------------------
@@ -135,7 +134,14 @@ def normalize_headers(df: pd.DataFrame) -> pd.DataFrame:
         "date of purchase": {"date", "purchase date", "date purchased"},
         "coin type": {"coin", "asset", "symbol", "ticker"},
         "quantity": {"qty", "amount", "units"},
-        "cost per coin (usd)": {"cost per coin", "price", "unit price", "ppercoin", "price usd", "costpercoinusd"},
+        "cost per coin (usd)": {
+            "cost per coin",
+            "price",
+            "unit price",
+            "ppercoin",
+            "price usd",
+            "costpercoinusd",
+        },
         "feesusd": {"fees", "fee", "fee usd", "fees (usd)"},
         "exchange": {"exchange", "platform", "broker"},
         "txid": {"txid", "tx id", "transaction id", "hash"},
@@ -217,7 +223,6 @@ def enrich(df: pd.DataFrame, offline: bool = False) -> pd.DataFrame:
 
     out["Unrealized P/L (USD)"] = pd.NA
     out["Unrealized P/L (%)"] = pd.NA
-
 
     if offline:
         return out.drop(columns=["Coin Key"])
