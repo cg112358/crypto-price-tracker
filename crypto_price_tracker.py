@@ -227,8 +227,6 @@ def enrich(df: pd.DataFrame, offline: bool = False) -> pd.DataFrame:
     if offline:
         return out.drop(columns=["Coin Key"])
 
-    import requests
-
     session = requests.Session()
     price_cache: Dict[str, PriceResult] = {}
 
