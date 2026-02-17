@@ -1,3 +1,5 @@
+import { plClass } from "../utils/plColor";
+
 function formatUSD(n) {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
@@ -10,11 +12,11 @@ function formatPercent(n) {
   return `${n.toFixed(2)}%`
 }
 
-function MetricCard({ label, value, subtext }) {
+function MetricCard({ label, value, subtext, valueClassName = "text-slate-50" }) {
   return (
     <div className="rounded-2xl border border-slate-800 bg-slate-950 p-5 shadow-sm">
       <div className="text-sm text-slate-400">{label}</div>
-      <div className="mt-2 text-2xl font-semibold text-slate-50">{value}</div>
+      <div className={`mt-2 text-2xl font-semibold ${valueClassName}`}>{value}</div>
       {subtext ? <div className="mt-1 text-xs text-slate-500">{subtext}</div> : null}
     </div>
   )
@@ -35,7 +37,8 @@ export default function SummaryCards({ summary }) {
       <MetricCard
         label="P/L"
         value={formatUSD(pnl)}
-        subtext={formatPercent(roi)}
+        valueClassName={plClass(pnl)}
+        subtext={<span className={plClass(pnl)}>{formatPercent(roi)}</span>}
       />
       <div className="rounded-2xl border border-slate-800 bg-slate-950 p-5 shadow-sm">
         <div className="text-sm text-slate-400">Status</div>
