@@ -1,0 +1,37 @@
+{
+  "summary": {
+    "total_invested": 12345.67,
+    "current_value": 15432.1,
+    "profit_loss": 3086.43,
+    "roi_percent": 25.0
+  },
+  "holdings": [
+    {
+      "symbol": "BTC",
+      "name": "Bitcoin",
+      "amount": 0.25,
+      "avg_cost": 32000,
+      "current_price": 42000,
+      "value": 10500,
+      "pnl": 2500
+    },
+    {
+      "symbol": "ETH",
+      "name": "Ethereum",
+      "amount": 2.0,
+      "avg_cost": 1800,
+      "current_price": 2400,
+      "value": 4800,
+      "pnl": 1200
+    },
+    {
+      "symbol": "XRP",
+      "name": "XRP",
+      "amount": 1000,
+      "avg_cost": 0.55,
+      "current_price": 0.62,
+      "value": 620,
+      "pnl": 70
+    }
+  ]
+}
