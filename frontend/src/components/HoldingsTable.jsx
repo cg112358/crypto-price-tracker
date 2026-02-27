@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { plClass } from "../utils/plColor";
 
 function formatUSD(n) {
   return new Intl.NumberFormat('en-US', {
@@ -108,8 +109,7 @@ export default function HoldingsTable({ holdings }) {
 
           <tbody>
             {rows.map((h) => {
-              const pnl = Number(h?.pnl ?? 0)
-              const pnlIsPositive = pnl >= 0
+              const pnl = Number(h?.pnl ?? 0)              
               return (
                 <tr
                   key={h.symbol}
@@ -123,7 +123,7 @@ export default function HoldingsTable({ holdings }) {
                   <td className="px-5 py-3">{formatUSD(h.avg_cost ?? 0)}</td>
                   <td className="px-5 py-3">{formatUSD(h.current_price ?? 0)}</td>
                   <td className="px-5 py-3">{formatUSD(h.value ?? 0)}</td>
-                  <td className={'px-5 py-3 font-medium ' + (pnlIsPositive ? 'text-emerald-400' : 'text-rose-400')}>
+                  <td className={`px-5 py-3 font-medium ${plClass(pnl)}`}>
                     {formatUSD(pnl)}
                   </td>
                 </tr>

@@ -1,53 +1,61 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState } from "react";
+import { roundTo } from "../utils/math";
 
 function toNumber(v) {
-  const n = Number(v)
-  return Number.isFinite(n) ? n : 0
+  const n = Number(v);
+  return Number.isFinite(n) ? n : 0;
 }
 
 function upper(v) {
-  return (v ?? '').toString().toUpperCase().trim()
+  return (v ?? "").toString().toUpperCase().trim();
 }
 
-export default function HoldingsEditor({ holdings, onChange }) {
-  const rows = Array.isArray(holdings) ? holdings : []
-  const [confirmIndex, setConfirmIndex] = useState(null)
+const DEFAULT_AMOUNT_STEP = 0.01;
+const AMOUNT_STEP = DEFAULT_AMOUNT_STEP;
 
-  const canRemove = useMemo(() => rows.length > 0, [rows.length])
+export default function HoldingsEditor({ holdings, onChange }) {
+  const rows = Array.isArray(holdings) ? holdings : [];
+  const [confirmIndex, setConfirmIndex] = useState(null);
+
+  const AMOUNT_STEP = DEFAULT_AMOUNT_STEP;
+
+  const canRemove = useMemo(() => rows.length > 0, [rows.length]);
 
   function addRow() {
     const next = [
       ...rows,
       {
-        symbol: 'NEW',
-        name: 'New Asset',
+        symbol: "NEW",
+        name: "New Asset",
         amount: 0,
+        amount_text: "0",
         avg_cost: 0,
+        avg_cost_text: "0",
         current_price: 0,
         value: 0,
         pnl: 0,
       },
-    ]
-    onChange(next)
+    ];
+    onChange(next);
   }
 
   function updateRow(index, patch) {
-    const next = rows.map((r, i) => (i === index ? { ...r, ...patch } : r))
-    onChange(next)
+    const next = rows.map((r, i) => (i === index ? { ...r, ...patch } : r));
+    onChange(next);
   }
 
   function requestRemove(index) {
-    setConfirmIndex(index)
+    setConfirmIndex(index);
   }
 
   function cancelRemove() {
-    setConfirmIndex(null)
+    setConfirmIndex(null);
   }
 
   function removeRow(index) {
-    const next = rows.filter((_, i) => i !== index)
-    onChange(next)
-    setConfirmIndex(null)
+    const next = rows.filter((_, i) => i !== index);
+    onChange(next);
+    setConfirmIndex(null);
   }
 
   return (
@@ -56,7 +64,8 @@ export default function HoldingsEditor({ holdings, onChange }) {
         <div>
           <h2 className="text-lg font-semibold text-slate-50">Edit Holdings</h2>
           <div className="text-xs text-slate-500">
-            Local-only edits (saved in your browser). Python remains source of truth for validation.
+            Local-only edits (saved in your browser). Python remains source of
+            truth for validation.
           </div>
         </div>
 
@@ -98,15 +107,17 @@ export default function HoldingsEditor({ holdings, onChange }) {
               >
                 <td className="px-5 py-3">
                   <input
-                    value={h.symbol ?? ''}
-                    onChange={(e) => updateRow(idx, { symbol: upper(e.target.value) })}
+                    value={h.symbol ?? ""}
+                    onChange={(e) =>
+                      updateRow(idx, { symbol: upper(e.target.value) })
+                    }
                     className="w-28 rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-slate-100 outline-none focus:border-slate-600"
                   />
                 </td>
 
                 <td className="px-5 py-3">
                   <input
-                    value={h.name ?? ''}
+                    value={h.name ?? ""}
                     onChange={(e) => updateRow(idx, { name: e.target.value })}
                     className="w-64 rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-slate-100 outline-none focus:border-slate-600"
                   />
@@ -115,40 +126,89 @@ export default function HoldingsEditor({ holdings, onChange }) {
                 <td className="px-5 py-3">
                   <div className="flex items-center gap-2">
                     <button
-                      onClick={() => updateRow(idx, { amount: Math.max(0, toNumber(h.amount) - 1) })}
+                      type="button"
+                      onClick={() => {
+                        const base = toNumber((h.amount_text ?? "").trim());
+                        const next = roundTo(
+                          Math.max(0, base - AMOUNT_STEP),
+                          8,
+                        );
+                        updateRow(idx, {
+                          amount: next,
+                          amount_text: String(next),
+                        });
+                      }}
                       className="rounded-lg border border-slate-800 bg-slate-950 px-2 py-1 text-slate-200 hover:bg-slate-900 transition-colors"
-                      title="-1"
+                      title={`-${AMOUNT_STEP}`}
                     >
-                      –
+                      -
                     </button>
 
                     <input
-                      value={h.amount ?? 0}
-                      onChange={(e) => updateRow(idx, { amount: Math.max(0, toNumber(e.target.value)) })}
+                      value={h.amount_text ?? String(h.amount ?? "")}
+                      onChange={(e) => {
+                        const text = e.target.value;
+                        if (!/^\d*\.?\d*$/.test(text)) return;
+                        updateRow(idx, { amount_text: text });
+                      }}
+                      onBlur={() => {
+                        const text = (h.amount_text ?? "").trim();
+                        if (text === "" || text === ".") {
+                          updateRow(idx, { amount: 0, amount_text: "0" });
+                          return;
+                        }
+                        const n = Math.max(0, toNumber(text));
+                        updateRow(idx, { amount: n, amount_text: text });
+                      }}
                       inputMode="decimal"
                       className="w-28 rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-slate-100 outline-none focus:border-slate-600"
                     />
 
                     <button
-                      onClick={() => updateRow(idx, { amount: toNumber(h.amount) + 1 })}
+                      type="button"
+                      onClick={() => {
+                        const base = toNumber((h.amount_text ?? "").trim());
+                        const next = roundTo(base + AMOUNT_STEP, 8);
+                        updateRow(idx, {
+                          amount: next,
+                          amount_text: String(next),
+                        });
+                      }}
                       className="rounded-lg border border-slate-800 bg-slate-950 px-2 py-1 text-slate-200 hover:bg-slate-900 transition-colors"
-                      title="+1"
+                      title={`+${AMOUNT_STEP}`}
                     >
                       +
                     </button>
                   </div>
 
-                  <div className="mt-1 text-xs text-slate-500">Step size = 1 (we’ll tune this later)</div>
+                  <div className="mt-1 text-xs text-slate-500">
+                    Step size = {AMOUNT_STEP}
+                  </div>
                 </td>
 
                 <td className="px-5 py-3">
                   <input
-                    value={h.avg_cost ?? 0}
-                    onChange={(e) => updateRow(idx, { avg_cost: Math.max(0, toNumber(e.target.value)) })}
+                    value={h.avg_cost_text ?? String(h.avg_cost ?? "")}
+                    onChange={(e) => {
+                      const text = e.target.value;
+                      if (!/^\d*\.?\d*$/.test(text)) return;
+                      updateRow(idx, { avg_cost_text: text });
+                    }}
+                    onBlur={() => {
+                      const text = (h.avg_cost_text ?? "").trim();
+                      if (text === "" || text === ".") {
+                        updateRow(idx, { avg_cost: 0, avg_cost_text: "0" });
+                        return;
+                      }
+                      const n = Math.max(0, toNumber(text));
+                      updateRow(idx, { avg_cost: n, avg_cost_text: String(n) });
+                    }}
                     inputMode="decimal"
                     className="w-32 rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-slate-100 outline-none focus:border-slate-600"
                   />
-                  <div className="mt-1 text-xs text-slate-500">Manual (for now)</div>
+                  <div className="mt-1 text-xs text-slate-500">
+                    Manual (for now)
+                  </div>
                 </td>
 
                 <td className="px-5 py-3">
@@ -190,5 +250,5 @@ export default function HoldingsEditor({ holdings, onChange }) {
         </table>
       </div>
     </section>
-  )
+  );
 }
