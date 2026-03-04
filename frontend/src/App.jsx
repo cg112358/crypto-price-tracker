@@ -156,7 +156,9 @@ export default function App() {
     }
   }
 
-  const refreshPrices = useCallback(async ({ reason = "auto" }) => {
+  const refreshPrices = useCallback(async ({ reason = "auto" } = {}) => {
+    console.debug(`[refreshPrices] triggered by: ${reason}`);
+
     if (refreshInFlightRef.current) return;
     refreshInFlightRef.current = true;
 
@@ -268,7 +270,7 @@ export default function App() {
               Recalculate (local)
             </button>
             <button
-              onClick={refreshPrices}
+              onClick={() => refreshPrices({ reason: "manual" })}
               disabled={priceStatus === "loading"}
               className="w-fit rounded-xl border border-slate-800 bg-slate-950 px-3 py-2 text-sm text-slate-200 hover:bg-slate-900 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
               title="Fetch live USD prices from CoinGecko and recompute"
