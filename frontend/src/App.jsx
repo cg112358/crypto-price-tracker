@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 import seed from "./data/mockPortfolio.json";
 import SummaryCards from "./components/SummaryCards.jsx";
 import HoldingsEditor from "./components/HoldingsEditor.jsx";
@@ -122,6 +122,16 @@ export default function App() {
   const [priceError, setPriceError] = useState("");
   const [lastUpdated, setLastUpdated] = useState(null);
 
+  const holdingsRef = useRef(holdings);
+  const refreshInFlightRef = useRef(false);
+
+  const abortRef = useRef(null);
+
+  useEffect(() => {
+    holdingsRef.current = holdings;
+  }, [holdings]);
+
+  // Persitant holdings
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(holdings));
@@ -146,30 +156,30 @@ export default function App() {
     }
   }
 
-  function recalcLocal() {
-    const next = recomputeHoldingsLocal(holdings);
-    setHoldings(next);
-    setSummary(recomputeSummaryLocal(next));
-  }
+  const refreshPrices = useCallback(async ({ reason = "auto" }) => {
+    if (refreshInFlightRef.current) return;
+    refreshInFlightRef.current = true;
 
-  async function refreshPrices() {
+    // cancel any previous request
+    if (abortRef.current) abortRef.current.abort();
+    abortRef.current = new AbortController();
+
     setPriceStatus("loading");
     setPriceError("");
 
     try {
-      const symbols = holdings.map((h) => normSymbol(h?.symbol));
+      const snapshot = holdingsRef.current;
 
+      const symbols = snapshot.map((h) => normSymbol(h?.symbol));
       const ids = Array.from(
         new Set(symbols.map((s) => COINGECKO_ID_BY_SYMBOL[s]).filter(Boolean)),
       );
 
-      if (ids.length === 0) {
-        throw new Error("No supported symbols found for pricing.");
-      }
+      const data = await fetchPricesFromCoinGecko(ids, {
+        signal: abortRef.current.signal,
+      });
 
-      const data = await fetchPricesFromCoinGecko(ids);
-
-      const nextRaw = holdings.map((h) => {
+      const nextRaw = snapshot.map((h) => {
         const symbol = normSymbol(h?.symbol);
         const id = COINGECKO_ID_BY_SYMBOL[symbol];
         const usd = id ? Number(data?.[id]?.usd ?? NaN) : NaN;
@@ -180,27 +190,47 @@ export default function App() {
       });
 
       const next = recomputeHoldingsLocal(nextRaw);
+
       setHoldings(next);
       setSummary(recomputeSummaryLocal(next));
 
-      // last_updated_at is per-id; use the max one if present
       const updatedAts = ids
         .map((id) => Number(data?.[id]?.last_updated_at ?? 0))
         .filter((n) => Number.isFinite(n) && n > 0);
 
-      if (updatedAts.length) {
-        setLastUpdated(new Date(Math.max(...updatedAts) * 1000));
-      } else {
-        setLastUpdated(new Date());
-      }
+      setLastUpdated(
+        updatedAts.length
+          ? new Date(Math.max(...updatedAts) * 1000)
+          : new Date(),
+      );
 
+      // ...rest unchanged...
       setPriceStatus("ok");
     } catch (err) {
+      if (err?.name === "AbortError") return; // ignore aborted refreshes
       setPriceStatus("error");
-      setPriceError(
-        err instanceof Error ? err.message : "Failed to fetch prices",
-      );
+      setPriceError(err?.message || "Failed to fetch (blocked/rate limit).");
+    } finally {
+      refreshInFlightRef.current = false;
+      abortRef.current = null;
     }
+  }, []);
+
+  // Auto refresh prices
+  useEffect(() => {
+    refreshPrices();
+
+    const interval = setInterval(() => {
+      refreshPrices();
+    }, 90000);
+
+    return () => clearInterval(interval);
+  }, [refreshPrices]);
+
+  function recalcLocal() {
+    const next = recomputeHoldingsLocal(holdings);
+    setHoldings(next);
+    setSummary(recomputeSummaryLocal(next));
   }
 
   return (
@@ -212,8 +242,7 @@ export default function App() {
               Crypto Portfolio Viewer
             </h1>
             <p className="mt-1 text-sm text-slate-400">
-              Edit holdings locally (Step 2A). Python recomputation comes later
-              (Step 2B).
+              Live CoinGecko pricing. Values recomputed in-browser.
             </p>
           </div>
 
