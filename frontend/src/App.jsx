@@ -218,13 +218,18 @@ export default function App() {
 
   // Auto refresh prices
   useEffect(() => {
-    refreshPrices();
+    let timer;
 
-    const interval = setInterval(() => {
-      refreshPrices();
-    }, 90000);
+    async function autoLoop() {
+      await refreshPrices({ reason: "auto" });
 
-    return () => clearInterval(interval);
+      const jitter = Math.floor(Math.random() * 2000); // prevent machine-like polling
+      timer = setTimeout(autoLoop, 90000 + jitter);
+    }
+
+    autoLoop();
+
+    return () => clearTimeout(timer);
   }, [refreshPrices]);
 
   function recalcLocal() {
