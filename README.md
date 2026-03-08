@@ -1,20 +1,41 @@
 # 🚀 Crypto Price Tracker
 
 ![CI](https://github.com/cg112358/crypto-price-tracker/actions/workflows/ci.yml/badge.svg?branch=main)
-![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)  
+![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)
 ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
 
-See the full [Git Cheatsheet](docs/git-cheatsheet.md) for workflow diagram, color legend, and common commands.
+A crypto portfolio tracker built with a **Python data pipeline** and a **React frontend**.
+
+The application reads crypto holdings from an Excel file, fetches live prices from the **CoinGecko API**, and calculates:
+
+- Position value
+- Cost basis
+- Unrealized profit/loss
+
+Results are exported to Excel and optionally CSV for offline portfolio analysis.
+
 ---
 
-A Python-based, offline-first crypto holdings tracker that integrates **data processing, API calls, and Excel automation**.  
-It reads your holdings from an Excel file, fetches live prices via the **CoinGecko API**, and outputs an updated file with  
-calculated **position values, cost basis, and unrealized profit/loss**. Results are saved to Excel (with **Holdings** and **Summary** sheets)  
-and optionally as CSV.
+## Architecture
 
-> Originally a simple script, this project was refactored for reliability, validation, and GitHub readiness with CI/CD checks.
+The project consists of two primary components:
+
+**Python Processing Pipeline**
+- Reads holdings data from Excel
+- Fetches market prices from CoinGecko
+- Calculates portfolio metrics and summaries
+- Generates updated Excel reports
+
+**React Frontend**
+- Interface for editing crypto holdings
+- Displays portfolio summaries and metrics
+- Supports live price refresh and portfolio updates
 
 ---
+
+## Repository Structure
+
+See [docs/TREE.md](docs/TREE.md) for the current project layout.
 
 ## ✨ Features
 - Input validation for required columns
@@ -24,6 +45,7 @@ and optionally as CSV.
 - Multiple outputs: Excel (`.xlsx`) and optional CSV
 - Friendly CLI and simple configuration
 - Fully tested with **pytest**, linted with **ruff**, and formatted with **black**
+- React frontend for portfolio visualization and editing
 
 ---
 
@@ -127,8 +149,8 @@ pre-commit install
 
 ## 🤝 Contributor Notes
 
-This project uses Git for version control.  
-For full workflow diagram, color legend, and command reference, see the [Git Cheatsheet](docs/git-cheatsheet.md).
+Repository structure is documented in [docs/TREE.md](docs/TREE.md).
+Development logs and archived notes live under [docs/logs](docs/logs).
 
 ---
 

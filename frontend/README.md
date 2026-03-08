@@ -1,16 +1,70 @@
-# React + Vite
+# Crypto Price Tracker — Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This directory contains the **React frontend** for the Crypto Price Tracker project.
 
-Currently, two official plugins are available:
+The UI allows users to:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- View portfolio summaries
+- Edit crypto holdings
+- Refresh live market prices
+- Track profit/loss performance
 
-## React Compiler
+The frontend displays portfolio data calculated by the Python processing pipeline.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- React
+- Vite
+- TailwindCSS
+- ESLint
+
+---
+
+## Project Structure
+
+```text
+src/
+├── components/   → UI components (tables, cards, editors)
+├── data/         → mock portfolio data used during development
+├── utils/        → helper utilities for formatting, math, and styling
+├── pages/        → application pages
+├── App.jsx       → main application logic
+└── main.jsx      → application entry point
+```
+
+---
+
+## Running the Frontend
+
+From the project root:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+The development server will start at:
+
+`http://localhost:5173`
+
+---
+
+## Key Components
+
+
+**HoldingsEditor**
+- Allows users to modify crypto portfolio positions.
+
+**HoldingsTable**
+- Displays holdings, price data, and position values.
+
+**SummaryCards**
+- Shows overall portfolio totals and profit/loss metrics.
+
+## Notes
+
+- The frontend currently uses mock portfolio data during development.
+- Integration with the backend processing pipeline is planned for future versions.
