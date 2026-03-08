@@ -246,10 +246,11 @@ export default function App() {
         <header className="mb-8 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
           <div>
             <h1 className="text-2xl font-semibold text-slate-50">
-              Crypto Portfolio Viewer
+              Crypto Portfolio Tracker
             </h1>
             <p className="mt-1 text-sm text-slate-400">
-              Live CoinGecko pricing. Values recomputed in-browser.
+              Track holdings with live CoinGecko pricing and in-browser
+              portfolio updates.
             </p>
           </div>
 
