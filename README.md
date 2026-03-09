@@ -1,7 +1,7 @@
 # 🚀 Crypto Price Tracker
 
 ![CI](https://github.com/cg112358/crypto-price-tracker/actions/workflows/ci.yml/badge.svg)
-![Python](https://img.shields.io/badge/python-3.11-blue.svg)
+![Python](https://img.shields.io/badge/python-3.11-blue.svg?logo=python)
 ![React](https://img.shields.io/badge/React-19-blue.svg?logo=react)
 ![Vite](https://img.shields.io/badge/Vite-7-purple.svg?logo=vite)
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
