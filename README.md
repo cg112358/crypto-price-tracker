@@ -1,8 +1,10 @@
 # 🚀 Crypto Price Tracker
 
-![CI](https://github.com/cg112358/crypto-price-tracker/actions/workflows/ci.yml/badge.svg?branch=main)
-![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)
-![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
+![CI](https://github.com/cg112358/crypto-price-tracker/actions/workflows/ci.yml/badge.svg)
+![Python](https://img.shields.io/badge/python-3.11-blue.svg)
+![React](https://img.shields.io/badge/React-18-blue.svg?logo=react)
+![Vite](https://img.shields.io/badge/Vite-5-purple.svg?logo=vite)
+![License](https://img.shields.io/badge/License-MIT-green.svg)
 
 A crypto portfolio tracker built with a **Python data pipeline** and a **React frontend**.
 
