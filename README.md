@@ -6,6 +6,16 @@
 ![Vite](https://img.shields.io/badge/Vite-7-purple.svg?logo=vite)
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
 
+🌐 **Live Demo:** [Open App](https://cg112358.github.io/crypto-price-tracker/)
+
+<p align="center">
+  <img src="docs/images/ui-dashboard.png" width="700">
+</p>
+
+<p align="center">
+  <em>React dashboard for editing holdings and viewing live portfolio metrics.</em>
+</p>
+
 A crypto portfolio tracker built with a **Python data pipeline** and a **React frontend**.
 
 The application reads crypto holdings from an Excel file, fetches live prices from the **CoinGecko API**, and calculates:
@@ -18,17 +28,56 @@ Results are exported to Excel and optionally CSV for offline portfolio analysis.
 
 ---
 
+## Tech Stack
+
+**Backend**
+
+- Python 3.11
+- CoinGecko API
+- Pandas
+- Excel export (openpyxl)
+
+**Frontend**
+
+- React 19
+- Vite 7
+- TailwindCSS
+- LocalStorage persistence
+
+**DevOps**
+
+- GitHub Actions CI
+- GitHub Pages deployment
+
 ## Architecture
 
 The project consists of two primary components:
 
+```text
+React Frontend (Vite)
+        │
+        │ Fetch live prices
+        ▼
+CoinGecko API
+        │
+        │ Portfolio calculations
+        ▼
+Python Data Pipeline
+        │
+        │ Export results
+        ▼
+Excel / CSV Reports
+```
+
 **Python Processing Pipeline**
+
 - Reads holdings data from Excel
 - Fetches market prices from CoinGecko
 - Calculates portfolio metrics and summaries
 - Generates updated Excel reports
 
 **React Frontend**
+
 - Interface for editing crypto holdings
 - Displays portfolio summaries and metrics
 - Supports live price refresh and portfolio updates
@@ -40,6 +89,7 @@ The project consists of two primary components:
 See [docs/TREE.md](docs/TREE.md) for the current project layout.
 
 ## ✨ Features
+
 - Input validation for required columns
 - Live prices via CoinGecko (with retries) — or `--offline` mode for testing
 - Per-position metrics: **Cost Basis**, **Position Value**, **Unrealized P/L (USD/%)**
@@ -52,7 +102,8 @@ See [docs/TREE.md](docs/TREE.md) for the current project layout.
 ---
 
 ## 📦 Requirements / Installation
-- Python 3.9+
+
+- Python 3.11
 - pandas
 - requests
 - openpyxl
